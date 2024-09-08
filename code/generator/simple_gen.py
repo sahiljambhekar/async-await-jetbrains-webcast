@@ -21,7 +21,7 @@ def fib():
 result = fib()
 
 for n in result:
-    print(n, end=', ')
+    print(n, end=", ")
     if n > 10000:
         break
 

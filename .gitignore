@@ -105,8 +105,16 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-.idea/encodings.xml
-.idea/misc.xml
-.idea/modules.xml
-.idea/webcast.iml
-.idea/workspace.xml
+# IDE
+.idea/
+
+# MacOS
+.DS_Store
+
+# Ruff
+.ruff_cache/
+
+# Dist
+dist/
+
+# More...

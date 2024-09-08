@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 from asyncio import AbstractEventLoop
+from re import S
 
 import colorama
 import random
@@ -19,21 +20,26 @@ def main():
     # Run these with asyncio.gather()
 
     task = asyncio.gather(
-        generate_data(10, data),
-        generate_data(10, data),
-        process_data(5, data),
-        process_data(5, data),
-        process_data(5, data),
-        process_data(5, data)
+        generate_data(10, data, "Producer1"),
+        generate_data(10, data, "Producer2"),
+        process_data(5, data, "Consumer1"),
+        process_data(5, data, "Consumer2"),
+        process_data(5, data, "Consumer3"),
+        process_data(5, data, "Consumer4"),
     )
 
     loop.run_until_complete(task)
 
     dt = datetime.datetime.now() - t0
-    print(colorama.Fore.WHITE + "App exiting, total time: {:,.2f} sec.".format(dt.total_seconds()), flush=True)
+    print(
+        colorama.Fore.WHITE
+        + "App exiting, total time: {:,.2f} sec.".format(dt.total_seconds()),
+        flush=True,
+    )
 
 
-async def generate_data(num: int, data: asyncio.Queue):
+### producer
+async def generate_data(num: int, data: asyncio.Queue, name: str):
     for idx in range(1, num + 1):
         item = idx * idx
         # Use queue
@@ -41,13 +47,17 @@ async def generate_data(num: int, data: asyncio.Queue):
         # data.append(work)
         await data.put(work)
 
-        print(colorama.Fore.YELLOW + " -- generated item {}".format(idx), flush=True)
+        print(
+            colorama.Fore.YELLOW + " -- generated item {} in {}".format(idx, name),
+            flush=True,
+        )
         # Sleep better
         # time.sleep(random.random() + .5)
-        await asyncio.sleep(random.random() + .5)
+        await asyncio.sleep(random.random() + 0.5)
 
 
-async def process_data(num: int, data: asyncio.Queue):
+### con
+async def process_data(num: int, data: asyncio.Queue, name: str):
     processed = 0
     while processed < num:
         # Use queue
@@ -61,14 +71,19 @@ async def process_data(num: int, data: asyncio.Queue):
         processed += 1
         value = item[0]
         t = item[1]
-        dt = datetime.datetime.now() - t
+        delay = datetime.datetime.now() - t
 
-        print(colorama.Fore.CYAN +
-              " +++ Processed value {} after {:,.2f} sec.".format(value, dt.total_seconds()), flush=True)
+        print(
+            colorama.Fore.CYAN
+            + " +++ Processed value {} in {} after {:,.2f} sec.".format(
+                value, name, delay.total_seconds()
+            ),
+            flush=True,
+        )
         # Sleep better
         # time.sleep(.5)
-        await asyncio.sleep(.5)
+        await asyncio.sleep(0.5)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

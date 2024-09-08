@@ -1,17 +1,19 @@
 import datetime
+from asyncio import AbstractEventLoop
+
 import colorama
 import random
 import time
+import asyncio
 
 
 def main():
     t0 = datetime.datetime.now()
     print(colorama.Fore.WHITE + "App started.", flush=True)
     data = []
-    generate_data(10, data)
-    generate_data(10, data)
-    process_data(20, data)
-
+    loop: AbstractEventLoop = asyncio.get_event_loop()
+    tasks = [generate_data(10, data), generate_data(10, data), process_data(20, data)]
+    loop.run_until_complete(tasks)
     dt = datetime.datetime.now() - t0
     print(
         colorama.Fore.WHITE
@@ -20,7 +22,7 @@ def main():
     )
 
 
-def generate_data(num: int, data: list):
+async def generate_data(num: int, data: list):
     for idx in range(1, num + 1):
         item = idx * idx
         data.append((item, datetime.datetime.now()))
@@ -29,7 +31,7 @@ def generate_data(num: int, data: list):
         time.sleep(random.random() + 0.5)
 
 
-def process_data(num: int, data: list):
+async def process_data(num: int, data: list):
     processed = 0
     while processed < num:
         item = data.pop(0)
